@@ -1,0 +1,23 @@
+body{
+  background-color: pink;
+  color:rgba(0, 0, 0, 0.8)
+}
+#item{
+  align-self: center;
+  width:500px;
+  margin-bottom: 10px;
+}
+.add-btn{
+  width: 200px;
+  box-shadow: rgba(0, 0, 0, 0.468) 0.5px 0.5px 2px 2px;
+}
+.add-btn:hover{
+  color:lightseagreen;
+  transition: 0.3s ease-in-out;
+  background-color: lightcoral;
+}
+.delete-btn{
+  margin-left: 10px;
+  color: red;
+  border-color: red;
+}
