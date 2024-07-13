@@ -1,0 +1,85 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  font-family: "Space Grotesk", sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+#root {
+  display: grid;
+  grid-template-columns: 256px 1fr;
+  background-color: #f1f3f5;
+}
+
+@layer base {
+  main {
+    @apply p-6;
+  }
+
+  tr {
+    @apply text-left;
+  }
+
+  th,
+  td {
+    @apply px-2 py-4 md:px-4 lg:px-6;
+  }
+}
+
+@layer components {
+  .box {
+    @apply bg-white rounded border border-[#dee2e6] p-4 shadow-sm md:p-6 lg:p-8;
+  }
+
+  .form-input-box {
+    @apply flex-1 rounded border border-[#dee2e6] p-2;
+  }
+
+  .form-label {
+    @apply text-lg md:w-[156px] lg:w-[256px];
+  }
+
+  .nav-button {
+    @apply w-full hover:bg-gray-200 px-4 text-left py-2 md:px-6 lg:px-8 flex items-center gap-4;
+  }
+
+  .nav-button.active-link {
+    @apply bg-blue-200 text-blue-700;
+  }
+
+  .card {
+    @apply bg-white p-6 border border-gray-300 rounded-lg;
+  }
+
+  .card h2 {
+    @apply text-lg mb-3;
+  }
+
+  .card p {
+    @apply text-2xl font-bold;
+  }
+
+  .dashboard-container {
+    @apply grid grid-cols-3 gap-8;
+  }
+}
+
+@layer utilities {
+}

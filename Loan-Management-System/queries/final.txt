@@ -1,0 +1,148 @@
+
+**TABLE CREATION**
+
+create table Bank (
+    Code int primary key,
+    Name varchar(32),
+    Addr varchar(32),
+    Estd_Date Date
+);
+
+create table Branch (
+    Id int primary key,
+    Name varchar(32),
+    Location varchar(32),
+    Code int,
+    foreign key(Code) references Bank(Code) on delete cascade
+);
+
+create table Customer (
+    Id int primary key,
+    Name varchar(32),
+    Addr varchar(32),
+    Email varchar(32),
+    Ph_No varchar(10)
+);
+
+create table Loan (
+    Id int primary key,
+    Amount int,
+    Interest_rate int,
+    Term int,
+    Issue_date Date,
+    Branch_id int,
+    foreign key(Branch_id) references Branch(Id) on delete cascade
+);
+
+create table Loan_Customer_Mapping (
+    Customer_id int,
+    Loan_id int,
+    Amount_repaid int,
+    Status varchar(16),
+    primary key(Customer_id, Loan_id),
+    foreign key(Customer_id) references Customer(Id) on delete cascade,
+    foreign key(Loan_Id) references Loan(Id) on delete cascade
+);
+
+create table Payment (
+    Id int primary key,
+    Amount int,
+    Date Date,
+    Method varchar(16),
+    Loan_id int,
+    foreign key(Loan_id) references Loan(id) on delete cascade
+);
+
+create table Loan_Officer (
+    Id int primary key,
+    Name varchar(32),
+    Email varchar(32),
+    Phone_number varchar(10),
+    Branch_id int,
+    foreign key(Branch_id) references Branch(Id) on delete cascade
+);
+
+
+**TRIGGER**
+
+
+CREATE TRIGGER update_loan_status
+BEFORE UPDATE ON Loan
+FOR EACH ROW
+BEGIN
+    DECLARE total_to_be_paid DECIMAL(10, 2);
+    SET total_to_be_paid = NEW.Loan_Amount * (1 + (NEW.Interest_Rate / 100) * (NEW.Loan_Duration / 12));
+    IF NEW.Amount_Repaid = total_to_be_paid THEN
+        SET NEW.Approval_Status = 'Paid';
+    END IF;
+END;
+
+
+
+**SELECT Queries**
+
+select * from Dashboard_Stats
+select * from Bank
+select * from Loan_Officer
+select * from Branch
+select * from Customer
+
+select * 
+from Loan 
+JOIN Loan_Customer_Mapping on Loan.Id = Loan_Customer_Mapping.Loan_id;
+
+select * 
+from Loan 
+JOIN Loan_Customer_Mapping on Loan.Id = Loan_Customer_Mapping.Loan_id 
+JOIN Customer on Customer.Id = Loan_Customer_Mapping.Customer_id 
+having Loan_id = ? 
+
+select * from Payment
+
+select * 
+from Payment 
+where Loan_id = ?;  
+
+
+**INSERT Queries**
+
+insert into Bank values(?, ?, ?, ?)
+insert into Loan_Officer values(?, ?, ?, ?, ?)
+insert into Branch values(?, ?, ?, ?)
+insert into Customer values(?, ?, ?, ?, ?)
+
+START TRANSACTION;
+INSERT INTO Loan VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO Loan_Customer_Mapping VALUES (?, ?, 0, "Pending");
+COMMIT;
+
+START TRANSACTION;
+INSERT INTO Payment VALUES (?, ?, ?, ?, ?);
+UPDATE Loan_Customer_Mapping 
+SET Amount_repaid = Amount_repaid + ?
+WHERE Loan_id = ?;
+COMMIT;
+
+
+**UPDATE Queries**
+
+update Loan_Customer_Mapping 
+set Status = ? 
+where Loan_Id = ?
+
+UPDATE Bank SET Name = ?, Addr = ? WHERE Code = ?
+UPDATE Loan_Officer SET Name = ?, Email = ?, Phone_number = ? WHERE Id = ?
+UPDATE Branch SET Name = ?, Location = ? WHERE Id = ?
+UPDATE Customer SET Name = ?, Addr = ?, Email = ?, Ph_No = ? WHERE Id = ?
+
+
+**DELETE Queries**
+
+DELETE FROM Bank WHERE Code = ?
+DELETE FROM Loan_Officer WHERE Id = ?
+DELETE FROM Branch WHERE Id = ?
+DELETE FROM Customer WHERE Id = ?
+DELETE FROM Payment WHERE Id = ?
+DELETE FROM Loan WHERE Id = ?
+
+
