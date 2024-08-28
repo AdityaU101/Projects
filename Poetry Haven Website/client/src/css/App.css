@@ -1,0 +1,64 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Lato', sans-serif;
+    color: #333;
+    background-color: #f9f9f9;
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Playfair Display', serif;
+}
+
+.web-body {
+    background-image: url('../images/backgroundBody.jpeg');
+    background-size: cover;
+    background-position: center;
+    animation: backgroundZoom 5s alternate;
+}
+
+.web-top{
+    background-image: url('../images/bghero.jpg');
+    background-size: cover;
+}
+
+@keyframes backgroundZoom {
+    0% {
+        transform: scale(0.9);
+    }
+
+    
+}
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6c63ff, #3a8dff);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #3a8dff, #6c63ff);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #6c63ff #f0f0f0;
+}
+
+body {
+    scrollbar-color: #6c63ff #f0f0f0;
+}
