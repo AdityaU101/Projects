@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Nunito Sans", sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+@layer base {
+  table {
+    @apply w-full;
+  }
+
+  td,
+  th {
+    @apply border px-4 py-2;
+  }
+}
+
+@layer components {
+  #root {
+    @apply grid grid-cols-app grid-rows-app;
+  }
+
+  aside nav li {
+    @apply px-4 py-3 hover:bg-gray-600 bg-gray-400 hover:text-white rounded flex items-center gap-3 text-lg leading-none font-bold;
+  }
+
+  aside nav li span {
+    @apply mt-0.5;
+  }
+}
