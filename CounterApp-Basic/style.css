@@ -1,0 +1,88 @@
+body {
+    background-color: #f0f4f8;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    padding: 30px;
+    color: #333;
+}
+
+h1 {
+    font-size: 36px;
+    margin: 10px;
+    color: #444;
+    animation: fadeInText 1.5s ease-in-out;
+}
+
+h2 {
+    font-size: 48px;
+    color: #888;
+    animation: zoomIn 0.5s ease;
+}
+
+button {
+    background-color: #333;
+    color: #fff;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    margin: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    transform: translateY(-5px);
+    background-color: #555;
+}
+
+#increment {
+    background-color: #ff6f61;
+}
+
+#decrement {
+    background-color: #61dafb;
+}
+
+#save {
+    background-color: #4caf50;
+}
+
+#sa {
+    font-size: 18px;
+    color: #666;
+    animation: slideIn 1s ease-in;
+}
+
+@keyframes fadeInText {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.8);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
