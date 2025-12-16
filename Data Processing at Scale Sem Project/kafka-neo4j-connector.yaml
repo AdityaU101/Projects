@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-neo4j-connector
+  labels:
+    app: kafka-neo4j-connector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-neo4j-connector
+  template:
+    metadata:
+      labels:
+        app: kafka-neo4j-connector
+    spec:
+      containers:
+        - name: kafka-neo4j-connector
+          image: veedata/kafka-neo4j-connect:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: CONNECT_BOOTSTRAP_SERVERS
+              value: "kafka-service:29092"
