@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inventory (Browser-Only)</title>
+  <style>
+    :root { --bg:#0b1324; --card:#111a33; --text:#e9eefc; --muted:#aab3d4; --primary:#4f8cff; --warn:#ffb347; --danger:#ff6b6b; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, Arial, sans-serif; color:var(--text); background: linear-gradient(180deg,#0b1324 0%,#0d1530 100%); min-height:100vh; }
+    .navbar { position:sticky; top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(17,26,51,.85); backdrop-filter: blur(8px); border-bottom:1px solid rgba(255,255,255,.08); }
+    .brand { font-weight:700; }
+    .links { display:flex; gap:6px; flex-wrap:wrap; }
+    .navlink { color:var(--muted); text-decoration:none; padding:6px 10px; border-radius:8px; border:1px solid transparent; }
+    .navlink.active { background: rgba(79,140,255,.15); color:var(--text); border-color: rgba(79,140,255,.2); }
+    .container { width:min(1200px,94%); margin: 18px auto 40px; }
+    h1,h2,h3 { margin:14px 0; }
+    .center { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:45vh; gap:12px; }
+    button { background:#1a2547; color:var(--text); border:1px solid rgba(255,255,255,.12); padding:8px 12px; border-radius:8px; cursor:pointer; }
+    button.primary { background:var(--primary); color:#061126; border:none; font-weight:600; }
+    button.danger { background:var(--danger); color:#180707; border:none; font-weight:600; }
+    input, select, textarea { background:#0e1731; color:var(--text); border:1px solid rgba(255,255,255,.14); padding:8px 10px; border-radius:8px; width:100%; }
+    label { display:flex; flex-direction:column; gap:6px; font-size:14px; color:var(--muted); }
+    .form { background:var(--card); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,.1); margin-top:12px; }
+    .grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); }
+    .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0; }
+    .table { width:100%; border-collapse: collapse; background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:12px; overflow:hidden; }
+    .table th, .table td { padding:10px; border-bottom:1px solid rgba(255,255,255,.06); text-align:left; vertical-align: top; }
+    .table thead { background: rgba(255,255,255,.04); }
+    .warn { color: var(--warn); }
+    .warn-row { background: rgba(255,179,71,.08); }
+    .kpis { display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin: 12px 0 16px; }
+    .kpi { background: var(--card); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,.08); }
+    .kpi-label { color: var(--muted); font-size:13px; }
+    .kpi-value { font-size:26px; font-weight:700; }
+    .avatar { width:28px; height:28px; border-radius:999px; object-fit:cover; border:1px solid rgba(255,255,255,.2); }
+    .upload input { display:none; }
+    .upload img { width:44px; height:44px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,.12); }
+    .actions { margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
+    .list { list-style:none; padding:0; margin:0 0 12px; }
+    .list li { display:flex; justify-content:space-between; align-items:center; padding:10px; background: var(--card); border:1px solid rgba(255,255,255,.08); border-radius:8px; margin-bottom:8px; gap:8px; }
+    .muted { color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="brand">Inventory (Local)</div>
+    <div class="links" id="navLinks"></div>
+    <div class="auth" id="authBox"></div>
+  </div>
+  <div class="container">
+    <div id="app"></div>
+  </div>
+
+  <script>
+    // ---- Simple State & Storage ----
+    const storeKeys = {
+      items: 'inv_items',
+      categories: 'inv_categories',
+      suppliers: 'inv_suppliers',
+      transactions: 'inv_transactions',
+      users: 'inv_users',
+      session: 'inv_session',
+      activity: 'inv_activity',
+    };
+
+    function read(key, fallback) {
+      try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch { return fallback; }
+    }
+    function write(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+
+    let state = {
+      route: 'dashboard',
+      filter: '',
+      user: read(storeKeys.session, null),
+      items: read(storeKeys.items, []),
+      categories: read(storeKeys.categories, []),
+      suppliers: read(storeKeys.suppliers, []),
+      transactions: read(storeKeys.transactions, []),
+      users: read(storeKeys.users, []),
+      activity: read(storeKeys.activity, []),
+      editingItemId: null,
+      editingCategoryId: null,
+      editingSupplierId: null,
+    };
+
+    function uid() { return Math.random().toString(36).slice(2, 10); }
+    function nowISO() { return new Date().toISOString(); }
+
+    function saveAll() {
+      write(storeKeys.items, state.items);
+      write(storeKeys.categories, state.categories);
+      write(storeKeys.suppliers, state.suppliers);
+      write(storeKeys.transactions, state.transactions);
+      write(storeKeys.users, state.users);
+      write(storeKeys.activity, state.activity);
+      if (state.user) write(storeKeys.session, state.user); else localStorage.removeItem(storeKeys.session);
+    }
+
+    // Seed default admin on first open (mock)
+    if (!state.users.length) {
+      state.users.push({ id: 'admin', email: 'admin@example.com', displayName: 'Admin', role: 'admin', createdAt: nowISO() });
+      saveAll();
+    }
+
+    // ---- Routing ----
+    const routes = ['dashboard','items','categories','suppliers','transactions','settings','activity'];
+    function navigate(to) { state.route = to; render(); }
+
+    // ---- Helpers ----
+    function currentStocks() {
+      const map = new Map();
+      for (const t of state.transactions) {
+        const q = Number(t.quantity||0);
+        const sign = t.type === 'in' ? 1 : -1;
+        map.set(t.itemId, (map.get(t.itemId)||0) + sign*q);
+      }
+      return map;
+    }
+
+    function kpiCounts() {
+      const stockMap = currentStocks();
+      const low = state.items.filter(i => (stockMap.get(i.id)||0) <= (Number(i.reorderPoint)||0)).length;
+      return { items: state.items.length, suppliers: state.suppliers.length, lowStock: low };
+    }
+
+    function logActivity(action, details) {
+      state.activity.unshift({ id: uid(), action, details, by: state.user?.email||'guest', at: nowISO() });
+      state.activity = state.activity.slice(0, 500); // cap
+    }
+
+    // ---- Auth (Mock) ----
+    function loginMock() {
+      const email = prompt('Enter your email (for mock login):', 'user@example.com');
+      if (!email) return;
+      state.user = { uid: uid(), email, displayName: email.split('@')[0], role: 'admin' };
+      logActivity('login', { email });
+      saveAll();
+      render();
+    }
+    function logoutMock() {
+      logActivity('logout', { email: state.user?.email });
+      state.user = null; saveAll(); render();
+    }
+
+    // ---- CSV ----
+    function exportCsv(filename, rows) {
+      if (!rows.length) { alert('No data'); return; }
+      const header = Object.keys(rows[0]);
+      const csv = [header.join(','), ...rows.map(r => header.map(h => JSON.stringify(r[h] ?? '')).join(','))].join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+    }
+    function parseCsv(file, cb) {
+      const fr = new FileReader();
+      fr.onload = () => {
+        const text = fr.result; const [first, ...lines] = text.split(/\r?\n/).filter(Boolean);
+        const header = first.split(',');
+        const rows = lines.map(line => {
+          const cols = line.split(','); const obj = {}; header.forEach((h,i)=>obj[h]=cols[i]); return obj;
+        });
+        cb({ header, rows });
+      };
+      fr.readAsText(file);
+    }
+
+    // ---- UI Primitives ----
+    function el(tag, attrs={}, ...children) {
+      const node = document.createElement(tag);
+      for (const [k,v] of Object.entries(attrs)) {
+        if (k === 'class') node.className = v;
+        else if (k === 'onclick') node.addEventListener('click', v);
+        else if (k === 'for') node.htmlFor = v;
+        else if (k.startsWith('on')) node.addEventListener(k.slice(2), v);
+        else node.setAttribute(k, v);
+      }
+      for (const c of children.flat()) {
+        if (c == null) continue;
+        node.appendChild(c.nodeType ? c : document.createTextNode(String(c)));
+      }
+      return node;
+    }
+
+    function renderNavbar() {
+      const links = document.getElementById('navLinks');
+      links.innerHTML = '';
+      for (const r of routes) {
+        const txt = r[0].toUpperCase()+r.slice(1);
+        const a = el('a', { href:'#', class:'navlink'+(state.route===r?' active':''), onclick:(e)=>{e.preventDefault(); navigate(r);} }, txt);
+        links.appendChild(a);
+      }
+      const authBox = document.getElementById('authBox');
+      authBox.innerHTML = '';
+      if (state.user) {
+        authBox.appendChild(el('span', { class:'muted' }, state.user.displayName||state.user.email));
+        authBox.appendChild(el('button', { onclick: logoutMock }, 'Logout'));
+      } else {
+        authBox.appendChild(el('button', { class:'primary', onclick: loginMock }, 'Sign In'));
+      }
+    }
+
+    // ---- Pages ----
+    function pageDashboard() {
+      const k = kpiCounts();
+      const recent = state.transactions.slice(0,5);
+      const table = el('table', { class:'table' },
+        el('thead', {}, el('tr', {}, el('th',{},'Item'), el('th',{},'Type'), el('th',{},'Qty'), el('th',{},'Date'))),
+        el('tbody', {}, ...recent.map(t => el('tr', {}, el('td',{}, itemName(t.itemId)), el('td',{}, t.type), el('td',{}, t.quantity), el('td',{}, new Date(t.createdAt).toLocaleString()))))
+      );
+      return el('div', {},
+        el('h2', {}, 'Dashboard'),
+        el('div', { class:'kpis' },
+          kpiBox('Items', k.items), kpiBox('Low Stock', k.lowStock, true), kpiBox('Suppliers', k.suppliers)
+        ),
+        el('h3', {}, 'Recent Transactions'), table
+      );
+    }
+    function kpiBox(label, value, warn=false) {
+      return el('div', { class:'kpi' }, el('div', { class:'kpi-label' }, label), el('div', { class:'kpi-value'+(warn?' warn':'') }, value));
+    }
+    function itemName(id) { return state.items.find(i=>i.id===id)?.name || id; }
+
+    function pageItems() {
+      const stockMap = currentStocks();
+      const wrapper = el('div');
+      wrapper.appendChild(el('h2', {}, 'Items'));
+      const search = el('input', { placeholder:'Search by name or SKU', value: state.filter, oninput: (e)=>{ state.filter = e.target.value; render(); } });
+
+      // CSV toolbar
+      const csvIn = el('input', { type:'file', accept: '.csv', onchange: (e)=>{
+        const f = e.target.files[0]; if (!f) return;
+        parseCsv(f, ({rows}) => {
+          for (const r of rows) {
+            const id = uid();
+            state.items.push({ id, name:r.name||'', sku:r.sku||'', unit:r.unit||'pcs', price:Number(r.price||0), reorderPoint:Number(r.reorderPoint||0), categoryId:r.categoryId||'', supplierId:r.supplierId||'', photo:r.photo||null, createdAt: nowISO(), updatedAt: nowISO() });
+          }
+          logActivity('csv_import_items', { count: rows.length });
+          saveAll(); render();
+        });
+      }});
+      const exportBtn = el('button', { onclick: ()=> exportCsv('items.csv', state.items) }, 'Export CSV');
+      const toolbar = el('div', { class:'toolbar' }, search, csvIn, exportBtn);
+      wrapper.appendChild(toolbar);
+
+      // table
+      const f = (state.filter||'').toLowerCase();
+      const filtered = state.items.filter(i => (i.name||'').toLowerCase().includes(f) || (i.sku||'').toLowerCase().includes(f));
+      const tbody = el('tbody', {}, ...filtered.map(i => {
+        const stock = stockMap.get(i.id)||0;
+        const tr = el('tr', { class: stock <= (Number(i.reorderPoint)||0) ? 'warn-row':'' },
+          el('td', {},
+            el('label', { class:'upload' },
+              el('input', { type:'file', accept:'image/*', onchange: e=>{
+                const file = e.target.files[0]; if (!file) return;
+                const fr = new FileReader(); fr.onload = ()=>{ i.photo = fr.result; i.updatedAt = nowISO(); saveAll(); render(); }; fr.readAsDataURL(file);
+              }}), i.photo ? el('img', { src:i.photo, alt:'' }) : el('span', {}, 'Upload')
+            )
+          ),
+          el('td', {}, i.name), el('td', {}, i.sku), el('td', {}, i.unit), el('td', {}, String(i.price)),
+          el('td', {}, String(stock)), el('td', {}, String(i.reorderPoint||0)),
+          el('td', {},
+            el('button', { onclick: ()=>{ state.editingItemId = i.id; render(); } }, 'Edit'),
+            ' ',
+            el('button', { class:'danger', onclick: ()=>{ if(confirm('Delete item?')) { state.items = state.items.filter(x=>x.id!==i.id); state.transactions = state.transactions.filter(t=>t.itemId!==i.id); logActivity('delete_item',{id:i.id}); saveAll(); render(); } } }, 'Delete')
+          )
+        );
+        return tr;
+      }));
+      const table = el('table', { class:'table' },
+        el('thead', {}, el('tr', {}, el('th',{},'Photo'), el('th',{},'Name'), el('th',{},'SKU'), el('th',{},'Unit'), el('th',{},'Price'), el('th',{},'Stock'), el('th',{},'Reorder'), el('th',{},'Actions'))),
+        tbody
+      );
+      wrapper.appendChild(table);
+
+      // form
+      const editing = state.items.find(i=>i.id===state.editingItemId);
+      const form = { id: editing?.id||null, name: editing?.name||'', sku: editing?.sku||'', unit: editing?.unit||'pcs', price: editing?.price||0, reorderPoint: editing?.reorderPoint||0, categoryId: editing?.categoryId||'', supplierId: editing?.supplierId||'' };
+      const formEl = el('form', { class:'form', onsubmit:(e)=>{ e.preventDefault();
+        if (form.id) {
+          const it = state.items.find(i=>i.id===form.id);
+          Object.assign(it, { ...form, price:Number(form.price||0), reorderPoint:Number(form.reorderPoint||0), updatedAt: nowISO() });
+          logActivity('update_item', { id: it.id });
+        } else {
+          const id = uid();
+          state.items.push({ id, ...form, price:Number(form.price||0), reorderPoint:Number(form.reorderPoint||0), createdAt: nowISO(), updatedAt: nowISO() });
+          logActivity('create_item', { id });
+        }
+        state.editingItemId = null; saveAll(); render();
+      } },
+        el('h3', {}, editing? 'Edit Item':'Add Item'),
+        el('div', { class:'grid' },
+          labelInput('Name', form.name, v=>form.name=v, true),
+          labelInput('SKU', form.sku, v=>form.sku=v),
+          labelInput('Unit', form.unit, v=>form.unit=v),
+          labelNumber('Price', form.price, v=>form.price=v, 0, 0.01),
+          labelNumber('Reorder Point', form.reorderPoint, v=>form.reorderPoint=v, 0, 1),
+          labelInput('Category ID', form.categoryId, v=>form.categoryId=v),
+          labelInput('Supplier ID', form.supplierId, v=>form.supplierId=v)
+        ),
+        el('div', { class:'actions' },
+          el('button', { class:'primary', type:'submit' }, editing? 'Update':'Create'),
+          editing ? el('button', { type:'button', onclick:()=>{ state.editingItemId=null; render(); } }, 'Cancel') : null
+        )
+      );
+      wrapper.appendChild(formEl);
+
+      return wrapper;
+    }
+
+    function labelInput(lbl, value, on, required=false) {
+      const input = el('input', { value, oninput:(e)=>on(e.target.value), ...(required?{required:true}:{}) });
+      return el('label', {}, lbl, input);
+    }
+    function labelNumber(lbl, value, on, min, step) {
+      const input = el('input', { type:'number', value, min, step, oninput:(e)=>on(e.target.value) });
+      return el('label', {}, lbl, input);
+    }
+
+    function pageCategories() {
+      const wrap = el('div');
+      wrap.appendChild(el('h2', {}, 'Categories'));
+      const list = el('ul', { class:'list' }, ...state.categories.map(c => el('li', {},
+        el('span', {}, c.name),
+        el('span', {},
+          el('button', { onclick: ()=>{ state.editingCategoryId = c.id; render(); } }, 'Edit'), ' ',
+          el('button', { class:'danger', onclick: ()=>{ if(confirm('Delete category?')) { state.categories = state.categories.filter(x=>x.id!==c.id); logActivity('delete_category',{id:c.id}); saveAll(); render(); } } }, 'Delete')
+        )
+      )));
+      wrap.appendChild(list);
+
+      const editing = state.categories.find(c=>c.id===state.editingCategoryId);
+      const form = { id: editing?.id||null, name: editing?.name||'' };
+      const formEl = el('form', { class:'form', onsubmit:(e)=>{ e.preventDefault();
+        if (form.id) { const c = state.categories.find(x=>x.id===form.id); c.name=form.name; c.updatedAt=nowISO(); logActivity('update_category',{id:c.id}); }
+        else { const id=uid(); state.categories.push({ id, name:form.name, createdAt: nowISO(), updatedAt: nowISO() }); logActivity('create_category',{id}); }
+        state.editingCategoryId=null; saveAll(); render();
+      } },
+        labelInput('Name', form.name, v=>form.name=v, true),
+        el('div', { class:'actions' }, el('button', { class:'primary', type:'submit' }, editing?'Update':'Add'), editing? el('button', { type:'button', onclick:()=>{ state.editingCategoryId=null; render(); } }, 'Cancel'):null)
+      );
+      wrap.appendChild(formEl);
+      return wrap;
+    }
+
+    function pageSuppliers() {
+      const wrap = el('div');
+      wrap.appendChild(el('h2', {}, 'Suppliers'));
+      const table = el('table', { class:'table' },
+        el('thead', {}, el('tr', {}, el('th',{},'Name'), el('th',{},'Email'), el('th',{},'Phone'), el('th',{},'Address'), el('th',{},'Actions'))),
+        el('tbody', {}, ...state.suppliers.map(s => el('tr', {},
+          el('td',{}, s.name), el('td',{}, s.email||''), el('td',{}, s.phone||''), el('td',{}, s.address||''),
+          el('td',{}, el('button', { onclick:()=>{ state.editingSupplierId=s.id; render(); } }, 'Edit'), ' ',
+            el('button', { class:'danger', onclick:()=>{ if(confirm('Delete supplier?')){ state.suppliers=state.suppliers.filter(x=>x.id!==s.id); logActivity('delete_supplier',{id:s.id}); saveAll(); render(); } } }, 'Delete'))
+        )))
+      );
+      wrap.appendChild(table);
+
+      const editing = state.suppliers.find(s=>s.id===state.editingSupplierId);
+      const form = { id: editing?.id||null, name: editing?.name||'', email: editing?.email||'', phone: editing?.phone||'', address: editing?.address||'' };
+      const formEl = el('form', { class:'form', onsubmit:(e)=>{ e.preventDefault();
+        if (form.id) { const s=state.suppliers.find(x=>x.id===form.id); Object.assign(s, form, { updatedAt: nowISO() }); logActivity('update_supplier',{id:s.id}); }
+        else { const id=uid(); state.suppliers.push({ id, ...form, createdAt: nowISO(), updatedAt: nowISO() }); logActivity('create_supplier',{id}); }
+        state.editingSupplierId=null; saveAll(); render();
+      } },
+        el('h3', {}, editing? 'Edit Supplier':'Add Supplier'),
+        el('div', { class:'grid' }, labelInput('Name', form.name, v=>form.name=v, true), labelInput('Email', form.email, v=>form.email=v), labelInput('Phone', form.phone, v=>form.phone=v), labelInput('Address', form.address, v=>form.address=v)),
+        el('div', { class:'actions' }, el('button', { class:'primary', type:'submit' }, editing?'Update':'Create'), editing? el('button', { type:'button', onclick:()=>{ state.editingSupplierId=null; render(); } }, 'Cancel') : null)
+      );
+      wrap.appendChild(formEl);
+      return wrap;
+    }
+
+    function pageTransactions() {
+      const wrap = el('div');
+      wrap.appendChild(el('h2', {}, 'Stock In/Out'));
+      // Form
+      const form = { itemId:'', type:'in', quantity:1, unitCost:0, note:'' };
+      const formEl = el('form', { class:'form', onsubmit:(e)=>{ e.preventDefault();
+        if (!form.itemId) return alert('Select an item');
+        state.transactions.unshift({ id: uid(), itemId: form.itemId, type: form.type, quantity: Number(form.quantity||0), unitCost: form.type==='in'? Number(form.unitCost||0): undefined, note: form.note||'', createdAt: nowISO() });
+        logActivity('transaction_'+form.type, { itemId: form.itemId, qty: Number(form.quantity||0) });
+        saveAll(); render();
+      } },
+        el('div', { class:'grid' },
+          // Item select
+          (function(){
+            const select = el('select', { onchange:(e)=> form.itemId = e.target.value }, el('option', { value:'' }, 'Select item'), ...state.items.map(i=>el('option', { value:i.id }, i.name)));
+            return el('label', {}, 'Item', select);
+          })(),
+          (function(){
+            const select = el('select', { onchange:(e)=> form.type = e.target.value }, el('option', { value:'in' }, 'IN'), el('option', { value:'out' }, 'OUT'));
+            return el('label', {}, 'Type', select);
+          })(),
+          labelNumber('Quantity', 1, v=>form.quantity=v, 1, 1),
+          (function(){
+            const input = el('input', { type:'number', min:'0', step:'0.01', value:'0', oninput:(e)=> form.unitCost = e.target.value });
+            return el('label', {}, 'Unit Cost (for IN)', input);
+          })(),
+          labelInput('Note', '', v=>form.note=v)
+        ),
+        el('div', { class:'actions' }, el('button', { class:'primary', type:'submit' }, 'Record'))
+      );
+      wrap.appendChild(formEl);
+
+      // Table
+      const rows = state.transactions.slice(0, 200);
+      const table = el('table', { class:'table' },
+        el('thead', {}, el('tr', {}, el('th',{},'Item'), el('th',{},'Type'), el('th',{},'Qty'), el('th',{},'Unit Cost'), el('th',{},'Note'), el('th',{},'Date'))),
+        el('tbody', {}, ...rows.map(r=> el('tr', {}, el('td',{}, itemName(r.itemId)), el('td',{}, r.type), el('td',{}, String(r.quantity)), el('td',{}, r.unitCost ?? '-'), el('td',{}, r.note||''), el('td',{}, new Date(r.createdAt).toLocaleString()))))
+      );
+      wrap.appendChild(el('h3', {}, 'Transactions'));
+      wrap.appendChild(table);
+      return wrap;
+    }
+
+    function pageSettings() {
+      const wrap = el('div');
+      wrap.appendChild(el('h2', {}, 'Settings'));
+      wrap.appendChild(el('p', {}, 'User: ', el('span', { class:'muted' }, state.user? (state.user.email):'Guest')));
+      // role picker for mock user
+      if (state.user) {
+        const select = el('select', { onchange:(e)=>{ state.user.role = e.target.value; saveAll(); } },
+          el('option', { value:'admin', selected: state.user.role==='admin' }, 'Admin'),
+          el('option', { value:'staff', selected: state.user.role==='staff' }, 'Staff')
+        );
+        wrap.appendChild(el('label', {}, 'Role', select));
+      }
+      wrap.appendChild(el('p', { class:'muted' }, 'This is a browser-only demo using localStorage. No real authentication or cloud sync.'));
+      return wrap;
+    }
+
+    function pageActivity() {
+      const wrap = el('div');
+      wrap.appendChild(el('h2', {}, 'Activity Log'));
+      const table = el('table', { class:'table' },
+        el('thead', {}, el('tr', {}, el('th',{},'Action'), el('th',{},'By'), el('th',{},'At'), el('th',{},'Details'))),
+        el('tbody', {}, ...state.activity.map(a => el('tr', {}, el('td',{}, a.action), el('td',{}, a.by), el('td',{}, new Date(a.at).toLocaleString()), el('td',{}, JSON.stringify(a.details)))) )
+      );
+      wrap.appendChild(table);
+      return wrap;
+    }
+
+    function render() {
+      renderNavbar();
+      const app = document.getElementById('app');
+      app.innerHTML = '';
+      if (!state.user) {
+        app.appendChild(el('div', { class:'center' }, el('h1', {}, 'Inventory (Local Demo)'), el('p',{},'Sign in (mock) to continue'), el('button', { class:'primary', onclick: loginMock }, 'Sign In')));
+        return;
+      }
+      let page;
+      switch(state.route){
+        case 'dashboard': page = pageDashboard(); break;
+        case 'items': page = pageItems(); break;
+        case 'categories': page = pageCategories(); break;
+        case 'suppliers': page = pageSuppliers(); break;
+        case 'transactions': page = pageTransactions(); break;
+        case 'settings': page = pageSettings(); break;
+        case 'activity': page = pageActivity(); break;
+        default: page = el('div', {}, 'Not Found');
+      }
+      app.appendChild(page);
+      saveAll();
+    }
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

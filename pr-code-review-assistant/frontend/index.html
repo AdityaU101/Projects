@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PR Code Review Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-clear {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-clear:hover {
+            background: #e0e0e0;
+        }
+        
+        .status-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .status-section.active {
+            display: block;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-badge.processing {
+            background: #cfe2ff;
+            color: #084298;
+        }
+        
+        .status-badge.completed {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .status-badge.failed {
+            background: #f8d7da;
+            color: #842029;
+        }
+        
+        .result-box {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            padding: 12px;
+            background: #f8d7da;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: #0d47a1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 PR Code Review Assistant</h1>
+            <p>Automated code analysis for pull requests</p>
+        </header>
+        
+        <div class="content">
+            <div class="info-box">
+                ✓ Backend services connected and running
+                <br/>Gateway: <span id="gateway-status">checking...</span>
+                | Fetcher: <span id="fetcher-status">checking...</span>
+                | Analyzer: <span id="analyzer-status">checking...</span>
+            </div>
+            
+            <form id="analyzeForm">
+                <div class="form-group">
+                    <label for="prUrl">GitHub PR URL</label>
+                    <input 
+                        type="text" 
+                        id="prUrl" 
+                        placeholder="https://github.com/owner/repo/pull/123"
+                        required
+                    />
+                </div>
+                
+                <div class="form-group">
+                    <label for="customDiff">PR Diff (or leave empty to fetch from GitHub)</label>
+                    <textarea 
+                        id="customDiff" 
+                        placeholder="Paste diff content here... (optional)"
+                    ></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn-submit">Analyze Pull Request</button>
+                    <button type="button" class="btn-clear" onclick="resetForm()">Clear</button>
+                </div>
+                
+                <div class="error-message" id="errorMessage"></div>
+            </form>
+            
+            <div class="status-section" id="statusSection">
+                <h2>Analysis Results</h2>
+                <div class="status-badge pending" id="statusBadge">
+                    <span class="spinner"></span>
+                    <span id="statusText">Submitting...</span>
+                </div>
+                <div>
+                    <strong>Job ID:</strong> <span id="jobId">-</span>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong>Status:</strong> <span id="currentStatus">pending</span>
+                </div>
+                <div class="result-box" id="resultBox" style="display: none;">
+                    <strong>Analysis Result:</strong>
+                    <div id="resultContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const GATEWAY_URL = 'http://localhost:8000';
+        const FETCHER_URL = 'http://localhost:8001';
+        const ANALYZER_URL = 'http://localhost:8002';
+        
+        // Health check on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkHealth();
+        });
+        
+        async function checkHealth() {
+            const services = [
+                { name: 'gateway', url: GATEWAY_URL, element: 'gateway-status' },
+                { name: 'fetcher', url: FETCHER_URL, element: 'fetcher-status' },
+                { name: 'analyzer', url: ANALYZER_URL, element: 'analyzer-status' }
+            ];
+            
+            for (const service of services) {
+                try {
+                    const response = await fetch(`${service.url}/health`, { 
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (response.ok) {
+                        document.getElementById(service.element).textContent = '✓ Running';
+                        document.getElementById(service.element).style.color = '#10b981';
+                    } else {
+                        document.getElementById(service.element).textContent = '✗ Error';
+                        document.getElementById(service.element).style.color = '#ef4444';
+                    }
+                } catch (error) {
+                    document.getElementById(service.element).textContent = '✗ Offline';
+                    document.getElementById(service.element).style.color = '#ef4444';
+                }
+            }
+        }
+        
+        document.getElementById('analyzeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const prUrl = document.getElementById('prUrl').value.trim();
+            const customDiff = document.getElementById('customDiff').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (!prUrl) {
+                errorMessage.textContent = 'Please enter a GitHub PR URL';
+                errorMessage.classList.add('show');
+                return;
+            }
+            
+            errorMessage.classList.remove('show');
+            
+            try {
+                // Show status section
+                document.getElementById('statusSection').classList.add('active');
+                document.getElementById('resultBox').style.display = 'none';
+                
+                // Submit analysis request
+                const response = await fetch(`${GATEWAY_URL}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pr_url: prUrl })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const jobId = data.job_id;
+                
+                document.getElementById('jobId').textContent = jobId;
+                document.getElementById('statusText').textContent = 'Analyzing...';
+                
+                // Poll for status
+                pollStatus(jobId);
+                
+            } catch (error) {
+                errorMessage.textContent = `Error: ${error.message}`;
+                errorMessage.classList.add('show');
+                document.getElementById('statusSection').classList.remove('active');
+            }
+        });
+        
+        async function pollStatus(jobId) {
+            const maxAttempts = 30;
+            let attempts = 0;
+            
+            const interval = setInterval(async () => {
+                attempts++;
+                
+                try {
+                    const response = await fetch(`${GATEWAY_URL}/status/${jobId}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Status check failed: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    const status = data.status;
+                    
+                    document.getElementById('currentStatus').textContent = status;
+                    
+                    const badge = document.getElementById('statusBadge');
+                    const statusText = document.getElementById('statusText');
+                    
+                    badge.className = `status-badge ${status}`;
+                    
+                    if (status === 'completed') {
+                        statusText.innerHTML = '✓ Analysis Complete';
+                        badge.querySelector('.spinner').style.display = 'none';
+                        document.getElementById('resultBox').style.display = 'block';
+                        document.getElementById('resultContent').textContent = data.result || 'No result available';
+                        clearInterval(interval);
+                    } else if (status === 'failed') {
+                        statusText.innerHTML = '✗ Analysis Failed';
+                        badge.querySelector('.spinner').style.display = 'none';
+                        clearInterval(interval);
+                    } else if (status === 'pending') {
+                        statusText.innerHTML = '<span class="spinner"></span> Queued...';
+                    } else if (status === 'processing') {
+                        statusText.innerHTML = '<span class="spinner"></span> Processing...';
+                    }
+                    
+                    if (attempts >= maxAttempts) {
+                        clearInterval(interval);
+                        statusText.innerHTML = '⏱ Timeout - still processing';
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }, 1000);
+        }
+        
+        function resetForm() {
+            document.getElementById('analyzeForm').reset();
+            document.getElementById('statusSection').classList.remove('active');
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

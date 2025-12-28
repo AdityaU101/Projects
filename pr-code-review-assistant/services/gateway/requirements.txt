@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+httpx
+sqlmodel
+psycopg2-binary
+rq
+redis
+python-dotenv
