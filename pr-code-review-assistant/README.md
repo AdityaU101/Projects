@@ -229,18 +229,3 @@ cd frontend && npm run dev
 - **Rate Limiting**: Throttle per GitHub user or IP
 - **Caching**: Cache GitHub diffs to avoid re-fetching
 
-## Interview Talking Points
-
-✅ **Microservices**: Loosely coupled services with clear responsibilities
-✅ **Async Processing**: RQ job queue for long-running tasks (diff analysis)
-✅ **REST API Design**: Proper HTTP semantics, status codes, error handling
-✅ **Database Design**: SQLModel ORM, migrations, indexing strategies
-✅ **Testing**: Unit tests, integration tests, mocking external APIs
-✅ **Docker**: Containerization, orchestration, local dev reproducibility
-✅ **Error Handling**: Graceful degradation, retry logic, circuit breakers
-✅ **Scalability**: How to add more workers, replicate services, cache results
-✅ **Security**: Environment variables for secrets, input validation, rate limiting
-
-## License
-
-MIT
