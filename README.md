@@ -1,138 +1,85 @@
-🚀 Aditya Upadhyay — Projects Portfolio
+<div align="center">
 
+# 🚀 Projects
 
+**A curated collection of my software engineering & ML projects — from full-stack web apps to cloud-native systems.**
 
-Welcome! This repository serves as a central hub for all my software projects, spanning machine learning, full-stack development, cloud systems, and fun side experiments. Each folder contains its own codebase and additional documentation where applicable.
+[![GitHub](https://img.shields.io/badge/GitHub-aditya--upadhyay-181717?style=flat-square&logo=github)](https://github.com/aditya-upadhyay)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Aditya%20Upadhyay-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/aditya-upadhyay)
+[![ASU](https://img.shields.io/badge/M.S.%20CS-Arizona%20State%20University-8C1D40?style=flat-square)](https://asu.edu)
 
+</div>
 
+---
 
-📦 Project Index
+## 👋 About This Repository
 
-1\. ML Driven VM Instance Selection for Cloud Workloads
+This is my personal project vault — a single place to browse everything I've built across **machine learning**, **cloud engineering**, **full-stack development**, and **systems design**. Each folder is a standalone project with its own README, source code, and documentation.
 
+---
 
+## 📂 Project Index
 
-Python, scikit-learn, AWS EC2
+| Project | Domain | Stack | Highlights |
+|---|---|---|---|
+| [🤖 ML Driven VM Instance Selection for Cloud Workloads](./ML%20Driven%20VM%20Instance%20Selection%20for%20Cloud%20Wo...) | Cloud / ML | Python, AWS EC2, scikit-learn | ~18% cost-efficiency gain via SAR-based clustering |
+| [😴 Drowsiness Detection System](./Drowsiness%20Detection%20System) | Computer Vision | Python, OpenCV, dlib | Real-time eye-tracking with shape_predictor |
+| [💰 Loan Management System](./Loan-Management-System) | Full-Stack Web | Node.js, Express, MySQL | End-to-end loan lifecycle management |
+| [📦 Inventory Management App](./Inventory%20Management%20App) | Full-Stack Web | React, Node.js, MongoDB | Integrated PR Code Review Assistant |
+| [🔍 PR Code Review Assistant](./pr-code-review-assistant) | DevTools / AI | Python, GitHub API | Automated pull request analysis and feedback |
+| [📊 Data Processing at Scale](./Data%20Processing%20at%20Scale%20Sem%20Project) | Data Engineering | Python, Spark / Pandas | Semester project on large-scale data pipelines |
+| [📝 ToDo List App](./ToDo_List/todo) | Web App | React, Node.js | Clean task management with CRUD operations |
+| [🔢 Counter App](./CounterApp) | Frontend | JavaScript, HTML/CSS | Minimalist interactive counter component |
+| [🎨 Color Flipper](./Color%20Flipper) | Frontend | JavaScript, HTML/CSS | Dynamic background color generator |
+| [🌸 Poetry Haven](./Poetry%20Haven%20Website/client) | Frontend / UI | React, CSS | Demo website for a poetry platform |
 
-Machine learning–based workload clustering and performance prediction to recommend optimal EC2 instance types. Achieved ~18% cost efficiency in benchmarking.
+---
 
+## 🛠️ Tech Stack at a Glance
 
+**Languages**
+`Python` `JavaScript` `Java` `C` `C++` `Bash`
 
-👉 Folder: ML Driven VM Instance Selection for Cloud Workloads
+**Frontend**
+`React.js` `HTML5` `CSS3` `Bootstrap`
 
-👉 Publication: ETCC 2025
+**Backend**
+`Node.js` `Express.js`
 
+**Databases**
+`MySQL` `MongoDB`
 
+**ML / CV**
+`scikit-learn` `TensorFlow` `OpenCV`
 
-2\. Drowsiness Detection System
+**Cloud & DevOps**
+`AWS (EC2, S3)` `GCP` `Git` `GitHub Actions` `Docker`
 
+---
 
+## 🌟 Featured Projects
 
-OpenCV, Python, React.js
+### 🔬 ML Driven VM Instance Selection
+> Intelligent cloud resource allocation using machine learning to match workloads to optimal EC2 instance types — achieving a measurable **~18% cost-efficiency gain** through SAR-based clustering.
 
-Real-time fatigue detection that auto-pauses videos, raises alerts, and logs engagement analytics designed for e-learning platforms.
+### 😴 Drowsiness Detection System
+> Real-time driver fatigue detection using computer vision. Tracks Eye Aspect Ratio (EAR) with dlib's shape predictor to trigger alerts before microsleep events occur.
 
+### 🔍 PR Code Review Assistant
+> An AI-powered tool that plugs into GitHub workflows to automatically analyze pull requests and surface feedback — reducing review turnaround time and catching issues early.
 
+---
 
-👉 Folder: Drowsiness Detection System
+## 📬 Let's Connect
 
+I'm actively looking for **Software Engineering / Cloud / ML roles** after my M.S. (May 2027).  
+Feel free to reach out if you'd like to collaborate or discuss any of these projects!
 
+> 📧 aupadh47@asu.edu  
+> 🔗 [LinkedIn](https://linkedin.com/in/aditya-upadhyay) · [GitHub](https://github.com/aditya-upadhyay)
 
-3\. Data Processing at Scale (Semester Project)
+---
 
-
-
-Distributed Systems, MapReduce, Cloud ETL
-
-A collection of high-volume data processing tasks built using distributed patterns and cloud-scale pipelines.
-
-
-
-👉 Folder: Data Processing at Scale Sem Project
-
-
-
-4\. Loan Management System
-
-
-
-React.js, Node.js, Express, MongoDB
-
-End-to-end loan workflow management with dashboards, repayment tracking, and automated status updates.
-
-
-
-👉 Folder: Loan-Management-System
-
-
-
-5\. Poetry Haven Website
-
-
-
-Frontend Web Development
-
-A creative web portal for reading and posting poetry, a clean UI exercise with responsive components.
-
-
-
-👉 Folder: Poetry Haven Website
-
-
-
-6\. ToDo List App
-
-
-
-JavaScript, HTML, CSS
-
-A minimal task manager app demonstrating DOM manipulation and component-based UI logic.
-
-
-
-👉 Folder: ToDo\_List
-
-
-
-7\. Counter App
-
-
-
-JavaScript
-
-A basic counter interface built as a practice component for state management fundamentals.
-
-
-
-👉 Folder: CounterApp
-
-
-
-8\. Color Flipper
-
-
-
-JavaScript
-
-A lightweight utility that dynamically changes background colors. A simple but classic UI practice project.
-
-
-
-👉 Folder: Color Flipper
-
-
-
-📬 Contact
-
-
-
-If you'd like to collaborate, discuss systems, or recruit for Summer 2026 SWE roles:
-
-
-
-Email: adityau24092003@gmail.com
-
-
-
-LinkedIn: https://www.linkedin.com/in/aditya-upadhyay2423/
-
+<div align="center">
+  <sub>Built with curiosity, caffeine, and a lot of debugging 🛠️</sub>
+</div>
