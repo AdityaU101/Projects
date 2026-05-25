@@ -22,16 +22,16 @@ This is my personal project vault — a single place to browse everything I've b
 
 | Project | Domain | Stack | Highlights |
 |---|---|---|---|
-| [🤖 ML Driven VM Instance Selection for Cloud Workloads] | Cloud / ML | Python, AWS EC2, scikit-learn | ~18% cost-efficiency gain via SAR-based clustering |
-| [😴 Drowsiness Detection System] | Computer Vision | Python, OpenCV, dlib | Real-time eye-tracking with shape_predictor |
-| [💰 Loan Management System] | Full-Stack Web | Node.js, Express, MySQL | End-to-end loan lifecycle management |
-| [📦 Inventory Management App] | Full-Stack Web | React, Node.js, MongoDB | Integrated PR Code Review Assistant |
-| [🔍 PR Code Review Assistant] | DevTools / AI | Python, GitHub API | Automated pull request analysis and feedback |
+| 🤖 ML Driven VM Instance Selection for Cloud Workloads | Cloud / ML | Python, AWS EC2, scikit-learn | ~18% cost-efficiency gain via SAR-based clustering |
+| 😴 Drowsiness Detection System | Computer Vision | Python, OpenCV, dlib | Real-time eye-tracking with shape_predictor |
+| 💰 Loan Management System | Full-Stack Web | Node.js, Express, MySQL | End-to-end loan lifecycle management |
+| 📦 Inventory Management App | Full-Stack Web | React, Node.js, MongoDB | Integrated PR Code Review Assistant |
+| 🔍 PR Code Review Assistant | DevTools / AI | Python, GitHub API | Automated pull request analysis and feedback |
 | 📊 Data Processing at Scale | Data Engineering | Python, Spark / Pandas | Semester project on large-scale data pipelines |
-| [📝 ToDo List App | Web App | React, Node.js | Clean task management with CRUD operations |
-| [🔢 Counter App] | Frontend | JavaScript, HTML/CSS | Minimalist interactive counter component |
-| [🎨 Color Flipper] | Frontend | JavaScript, HTML/CSS | Dynamic background color generator |
-| [🌸 Poetry Haven] | Frontend / UI | React, CSS | Demo website for a poetry platform |
+| 📝 ToDo List App | Web App | React, Node.js | Clean task management with CRUD operations |
+| 🔢 Counter App | Frontend | JavaScript, HTML/CSS | Minimalist interactive counter component |
+| 🎨 Color Flipper | Frontend | JavaScript, HTML/CSS | Dynamic background color generator |
+| 🌸 Poetry Haven | Frontend / UI | React, CSS | Demo website for a poetry platform |
 
 ---
 
