@@ -2,7 +2,7 @@
 
 # 🚀 Projects
 
-**A curated collection of my software engineering & ML projects — from full-stack web apps to cloud-native systems.**
+**A curated collection of my software engineering & ML projects ranging from full-stack web apps to cloud-native systems.**
 
 [![GitHub](https://img.shields.io/badge/GitHub-aditya--upadhyay-181717?style=flat-square&logo=github)](https://github.com/aditya-upadhyay)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Aditya%20Upadhyay-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/aditya-upadhyay)
@@ -14,7 +14,7 @@
 
 ## 👋 About This Repository
 
-This is my personal project vault — a single place to browse everything I've built across **machine learning**, **cloud engineering**, **full-stack development**, and **systems design**. Each folder is a standalone project with its own README, source code, and documentation.
+This is my personal project vault. It's a single place to browse everything I've built across **machine learning**, **cloud engineering**, **full-stack development**, and **systems design**. Each folder is a standalone project with its own README, source code, and documentation.
 
 ---
 
@@ -60,13 +60,13 @@ This is my personal project vault — a single place to browse everything I've b
 ## 🌟 Featured Projects
 
 ### 🔬 ML Driven VM Instance Selection
-> Intelligent cloud resource allocation using machine learning to match workloads to optimal EC2 instance types — achieving a measurable **~18% cost-efficiency gain** through SAR-based clustering.
+> Intelligent cloud resource allocation using machine learning to match workloads to optimal EC2 instance types, achieving a measurable **~18% cost-efficiency gain** through SAR-based clustering.
 
 ### 😴 Drowsiness Detection System
 > Real-time driver fatigue detection using computer vision. Tracks Eye Aspect Ratio (EAR) with dlib's shape predictor to trigger alerts before microsleep events occur.
 
 ### 🔍 PR Code Review Assistant
-> An AI-powered tool that plugs into GitHub workflows to automatically analyze pull requests and surface feedback — reducing review turnaround time and catching issues early.
+> An AI-powered tool that plugs into GitHub workflows to automatically analyze pull requests and surface feedback, reducing review turnaround time and catching issues early.
 
 ---
 
